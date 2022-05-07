@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block main %}
+
+    {% if message %}
+        <div class="alert alert-info ">
+             <strong>{{ message }}</strong>
+        </div>
+    {% endif %}
+    {% if latest_geography %}
+
+        <div class="card-columns" >
+        {% for capital in latest_geography %}
+        <div class="card bg-info">
+        <div class="card-body text-left">
+                    <a href="/geography/{{ capital.id }}/"
+                    style="text-decoration:none;color:white;font-size:15px">
+                        {{ capital.capital_text }}
+                    </a>
+        </div>
+        </div>
+        {% endfor %}
+         </div>
+
+    {% else %}
+        <p>Нет стран для проверки ваших знаний.</p>
+    {% endif %}
+{% endblock %}

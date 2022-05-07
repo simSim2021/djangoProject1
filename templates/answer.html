@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% block main %}
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js">
+</script>
+<h4 class="card-title">{{ capital.capital_text }}</h4>
+{% if error_message %}
+    <p class="alert alert-danger">
+        <strong>{{ error_message }}</strong>
+    </p>
+{% endif %}
+<form action="answer/" method="post">
+    {% csrf_token %}
+    {% for option in capital.option_set.all %}
+        <input type="radio"  name="option"
+            id="option{{ forloop.counter }}"
+            value="{{ option.id }}"/>
+        <label for="option{{ forloop.counter }}">
+            {{ option.text }}
+        </label><br>
+    {% endfor %}
+    <input type="submit" value="Ответить"/>
+</form>
+   <hr class="hr-horizontal-gradient">
+    <style>
+.hr-horizontal-gradient {
+	margin: 20px 0;
+	padding: 0;
+	height: 6px;
+	border: none;
+	background: linear-gradient(45deg, #333, #ddd);
+}
+</style>
+    <h4 >Оценка</h4>
+    <p style="font-weight:bold">Средняя оценка:
+        <span id="avg_mark_span">
+            {{ avg_mark }}
+        </span>
+    </p>
+{% if user.is_authenticated %}
+    {% if already_rated_by_user <= 0 or already_rated_by_user ==  None %}
+        <form action="post_mark/" method="post">
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-sm text-center">
+                    <input name="mark"
+                           type="radio"
+                           value="1"/> 1
+                </div>
+                <div class="col-sm text-center">
+                    <input name="mark"
+                           type="radio"
+                           value="2"/> 2
+                </div>
+                <div class="col-sm text-center">
+                    <input name="mark"
+                           type="radio"
+                           value="3"/> 3
+                </div>
+                <div class="col-sm text-center">
+                    <input name="mark"
+                           type="radio"
+                           value="4"/> 4
+                </div>
+                <div class="col-sm text-center">
+                    <input name="mark"
+                           type="radio"
+                           value="5"/> 5
+                </div>
+                <div class="col-sm text-center">
+                    <input class="btn btn-primary"
+                        type="submit"
+                        value="Отправить оценку"/>
+                </div>
+            </div>
+        </form>
+        {% else %}
+        Ваша оценка: {{ user_rating }}
+    {% endif %}
+{% endif %}
+
+
+<script>
+function send_msg_update_request(){
+   
+    $.get("get_mark/",{},parse_mark_update_response);
+}
+
+ function parse_mark_update_response(data, success){
+    res = JSON.parse(data);
+    $("#avg_mark_span").html(res["mark__avg"].toFixed(1));
+}
+setInterval(send_msg_update_request, 5000);
+</script>
+{% endblock %}
